@@ -11,7 +11,7 @@ import (
 
 // function
 // Order create, list, get, update, delete
-func (c *Config) CreateFlexibleIP(newFlexibleIP flexibleIP) flexibleIPResp {
+func (c *Config) CreateFlexibleIP(newFlexibleIP FlexibleIP) FlexibleIPResp {
 	json_data, err := json.Marshal(newFlexibleIP)
 	if err != nil {
 		log.Fatal(err)
@@ -37,7 +37,7 @@ func (c *Config) CreateFlexibleIP(newFlexibleIP flexibleIP) flexibleIPResp {
 		log.Fatal(err)
 	}
 
-	var ipResp flexibleIPResp
+	var ipResp FlexibleIPResp
 	err = json.Unmarshal(bodyBytes, &ipResp)
 	if err != nil {
 		log.Fatalln(err)
@@ -45,7 +45,7 @@ func (c *Config) CreateFlexibleIP(newFlexibleIP flexibleIP) flexibleIPResp {
 	return ipResp
 }
 
-func (c *Config) CreateSrv(server *server) srvResp {
+func (c *Config) CreateSrv(server *Server) SrvResp {
 	json_data, err := json.Marshal(server)
 
 	if err != nil {
@@ -71,7 +71,7 @@ func (c *Config) CreateSrv(server *server) srvResp {
 		log.Fatal(err)
 	}
 
-	var serverResponse srvResp
+	var serverResponse SrvResp
 	err = json.Unmarshal(bodyBytes, &serverResponse)
 	if err != nil {
 		log.Fatalln(err)
@@ -173,7 +173,7 @@ func (c *Config) ListUserData(serverID string) {
 	fmt.Println(bodyString)
 }
 
-func (c *Config) GetSrv(serverID string) srvResp {
+func (c *Config) GetSrv(serverID string) SrvResp {
 	req, err := http.NewRequest("GET", "https://api.scaleway.com/instance/v1/zones/"+c.Zone+"/servers/"+serverID, nil)
 	if err != nil {
 		log.Fatal(err)
@@ -193,7 +193,7 @@ func (c *Config) GetSrv(serverID string) srvResp {
 		log.Fatal(err)
 	}
 
-	var serverResp srvResp
+	var serverResp SrvResp
 	err = json.Unmarshal(bodyBytes, &serverResp)
 	if err != nil {
 		log.Fatalln(err)
@@ -202,7 +202,7 @@ func (c *Config) GetSrv(serverID string) srvResp {
 }
 
 func (c *Config) UpdateSrvState(serverID, state string) {
-	var newAction srvAction
+	var newAction SrvAction
 	newAction.Action = state
 	json_data, err := json.Marshal(newAction)
 	if err != nil {
@@ -311,7 +311,7 @@ type Server struct {
 	DynamicIPRequired bool     `json:"dynamic_ip_required,omitempty"` // Define if a dynamic IP is required for the instance
 	CommercialType    string   `json:"commercial_type"`               // Define the server commercial type (i.e. GP1-S)
 	Image             string   `json:"image,omitempty"`               // The server image ID
-	Volumes           volumes  `json:"volumes,omitempty"`             // The volumes attached to the server
+	Volumes           Volumes  `json:"volumes,omitempty"`             // The volumes attached to the server
 	EnableIPv6        bool     `json:"enable_ipv6"`                   // True if IPv6 is enabled on the server
 	PublicIP          string   `json:"public_ip,omitempty"`           // The ID of the reserved IP to attach to the server
 	BootType          string   `json:"boot_type,omitempty"`           // The boot type to use. Possible values are local, bootscript and rescue. The default value is local
@@ -324,7 +324,7 @@ type Server struct {
 }
 
 type Volumes struct {
-	Zero *zero `json:"0,omitempty"`
+	Zero *Zero `json:"0,omitempty"`
 }
 
 type Zero struct {
@@ -490,7 +490,7 @@ type FlexibleIP struct {
 }
 
 type FlexibleIPResp struct {
-	IP       ip     `json:"ip"`
+	IP       IP     `json:"ip"`
 	Location string `json:"Location"`
 }
 
