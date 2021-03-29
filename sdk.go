@@ -102,7 +102,7 @@ func (c *Config) AddUserData(serverID, userData string) {
 	fmt.Println(bodyString)
 }
 
-func (c *Config) ListServer() {
+func (c *Config) ListServers() {
 	req, err := http.NewRequest("GET", "https://api.scaleway.com/instance/v1/zones/"+c.Zone+"/servers", nil)
 	if err != nil {
 		log.Fatal(err)
@@ -171,6 +171,34 @@ func (c *Config) ListUserData(serverID string) {
 
 	bodyString := string(bodyBytes)
 	fmt.Println(bodyString)
+}
+
+func (c *Config) GetSecurityGroup(sercurityGroupID string) SecurityGroupResp {
+	req, err := http.NewRequest("GET", "https://api.scaleway.com/https://api.scaleway.com/instance/v1/zones/"+c.Zone+"/security_groups/"+sercurityGroupID, nil)
+	if err != nil {
+		log.Fatal(err)
+	}
+	req.Header.Add("X-Auth-Token", c.Token)
+	req.Header.Add("Content-Type", "application/json")
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer resp.Body.Close()
+
+	bodyBytes, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	var securityGroupResp SecurityGroupResp
+	err = json.Unmarshal(bodyBytes, &securityGroupResp)
+	if err != nil {
+		log.Fatalln(err)
+	}
+	return securityGroupResp
 }
 
 func (c *Config) GetSrv(serverID string) SrvResp {
@@ -482,7 +510,7 @@ type SrvAction struct {
 }
 
 type FlexibleIP struct {
-	Organization string   ` json:"organization,omitempty"`
+	Organization string   `json:"organization,omitempty"`
 	Project      string   `json:"project"`
 	Server       string   `json:"server,omitempty"`
 	Tags         []string `json:"tags,omitempty"`
@@ -529,6 +557,42 @@ type SrvResp struct {
 			} `json:"0"`
 		} `json:"volumes"`
 	} `json:"server"`
+}
+
+type SecurityGroup struct {
+	Name                  string `json:"name"`
+	Description           string `json:"description,omitempty"`
+	Organization          string `json:"organization,omitempty"`
+	Project               string `json:"project,omitempty"`
+	OrganizationDefault   bool   `json:"organization_default,omitempty"`
+	ProjectDefault        bool   `json:"project_default,omitempty"`
+	Stateful              bool   `json:"stateful,omitempty"`
+	InboundDefaultPolicy  string `json:"inbound_default_policy,omitempty"`
+	OutboundDefaultPolicy string `json:"outbound_default_policy,omitempty"`
+	EnableDefaultSecurity bool   `json:"enable_default_security,omitempty"`
+}
+
+type SecurityGroupResp struct {
+	sgroup struct {
+		ID                    string `json:"id"`
+		Name                  string `json:"name"`
+		Description           string `json:"description,omitempty"`
+		EnableDefaultSecurity bool   `json:"enable_default_security,omitempty"`
+		InboundDefaultPolicy  string `json:"inbound_default_policy,omitempty"`
+		OutboundDefaultPolicy string `json:"outbound_default_policy,omitempty"`
+		Organization          string `json:"organization,omitempty"`
+		Project               string `json:"project,omitempty"`
+		OrganizationDefault   bool   `json:"organization_default,omitempty"`
+		ProjectDefault        bool   `json:"project_default,omitempty"`
+		CreationDate          string `json:"creation_date,omitempty"`
+		ModificationDate      string `json:"modification_date,omitempty"`
+		Servers               struct {
+			ID   string `json:"id,omitempty"`
+			Name string `json:"name,omitempty"`
+		} `json:"servers,omitempty"`
+		Stateful bool   `json:"stateful,omitempty"`
+		Zone     string `json:"zone,omitempty"`
+	} `json:"security_group"`
 }
 
 type Config struct {
