@@ -9,7 +9,7 @@ import (
 	"net/http"
 )
 
-// function
+// functions
 // Order create, list, get, update, delete
 func (c *Config) CreateFlexibleIP(newFlexibleIP FlexibleIP) FlexibleIPResp {
 	json_data, err := json.Marshal(newFlexibleIP)
@@ -305,7 +305,6 @@ func (c *Config) DeleteSrv(serverID string) {
 }
 
 // structs
-
 type Server struct {
 	Name              string   `json:"name"`                          // The server name
 	DynamicIPRequired bool     `json:"dynamic_ip_required,omitempty"` // Define if a dynamic IP is required for the instance
