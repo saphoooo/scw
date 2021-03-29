@@ -306,7 +306,7 @@ func (c *Config) DeleteSrv(serverID string) {
 
 // structs
 
-type server struct {
+type Server struct {
 	Name              string   `json:"name"`                          // The server name
 	DynamicIPRequired bool     `json:"dynamic_ip_required,omitempty"` // Define if a dynamic IP is required for the instance
 	CommercialType    string   `json:"commercial_type"`               // Define the server commercial type (i.e. GP1-S)
@@ -323,11 +323,11 @@ type server struct {
 	PlacementGroup    string   `json:"placement_group,omitempty"`     // Placement group ID if server must be part of a placement group
 }
 
-type volumes struct {
+type Volumes struct {
 	Zero *zero `json:"0,omitempty"`
 }
 
-type zero struct {
+type Zero struct {
 	ID           string `json:"id"`                     // UUID of the volume
 	Name         string `json:"name"`                   // Name of the volume
 	Size         int    `json:"size"`                   // Disk size of the volume (in bytes)
@@ -477,24 +477,24 @@ type extraVolumes struct {
 }
 */
 
-type srvAction struct {
+type SrvAction struct {
 	Action string `json:"action"`         // poweron, backup, stop_in_place, poweroff, terminate and reboot
 	Name   string `json:"name,omitempty"` // name of the backup
 }
 
-type flexibleIP struct {
+type FlexibleIP struct {
 	Organization string   ` json:"organization,omitempty"`
 	Project      string   `json:"project"`
 	Server       string   `json:"server,omitempty"`
 	Tags         []string `json:"tags,omitempty"`
 }
 
-type flexibleIPResp struct {
+type FlexibleIPResp struct {
 	IP       ip     `json:"ip"`
 	Location string `json:"Location"`
 }
 
-type ip struct {
+type IP struct {
 	ID      string `json:"id,omitempty"`
 	Address string `json:"address,omitempty"`
 	Reverse string `json:"reverse,omitempty"`
@@ -508,7 +508,7 @@ type ip struct {
 	Zone         string   ` json:"zone,omitempty"`
 }
 
-type srvResp struct {
+type SrvResp struct {
 	Server struct {
 		ID                string   `json:"id"`
 		Name              string   `json:"name,omitempty"`
