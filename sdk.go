@@ -1,4 +1,4 @@
-package main
+package scw
 
 import (
 	"bytes"
@@ -11,18 +11,18 @@ import (
 
 // function
 // Order create, list, get, update, delete
-func createFlexibleIP(zone, token string, ip flexibleIP) flexibleIPResp {
-	json_data, err := json.Marshal(ip)
+func (c *Config) CreateFlexibleIP(newFlexibleIP flexibleIP) flexibleIPResp {
+	json_data, err := json.Marshal(newFlexibleIP)
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	fmt.Println(string(json_data))
-	req, err := http.NewRequest("POST", "https://api.scaleway.com/instance/v1/zones/"+zone+"/ips", bytes.NewBuffer(json_data))
+	req, err := http.NewRequest("POST", "https://api.scaleway.com/instance/v1/zones/"+c.Zone+"/ips", bytes.NewBuffer(json_data))
 	if err != nil {
 		log.Fatal(err)
 	}
-	req.Header.Add("X-Auth-Token", token)
+	req.Header.Add("X-Auth-Token", c.Token)
 	req.Header.Add("Content-Type", "application/json")
 
 	client := &http.Client{}
@@ -45,18 +45,18 @@ func createFlexibleIP(zone, token string, ip flexibleIP) flexibleIPResp {
 	return ipResp
 }
 
-func createSrv(server *server, zone, token string) srvResp {
+func (c *Config) CreateSrv(server *server) srvResp {
 	json_data, err := json.Marshal(server)
 
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	req, err := http.NewRequest("POST", "https://api.scaleway.com/instance/v1/zones/"+zone+"/servers", bytes.NewBuffer(json_data))
+	req, err := http.NewRequest("POST", "https://api.scaleway.com/instance/v1/zones/"+c.Zone+"/servers", bytes.NewBuffer(json_data))
 	if err != nil {
 		log.Fatal(err)
 	}
-	req.Header.Add("X-Auth-Token", token)
+	req.Header.Add("X-Auth-Token", c.Token)
 	req.Header.Add("Content-Type", "application/json")
 
 	client := &http.Client{}
@@ -79,12 +79,12 @@ func createSrv(server *server, zone, token string) srvResp {
 	return serverResponse
 }
 
-func addUserData(zone, token, serverID, userData string) {
-	req, err := http.NewRequest("PATCH", "https://api.scaleway.com/instance/v1/zones/"+zone+"/servers/"+serverID+"/user_data/cloud-init", bytes.NewBuffer([]byte(userData)))
+func (c *Config) AddUserData(serverID, userData string) {
+	req, err := http.NewRequest("PATCH", "https://api.scaleway.com/instance/v1/zones/"+c.Zone+"/servers/"+serverID+"/user_data/cloud-init", bytes.NewBuffer([]byte(userData)))
 	if err != nil {
 		log.Fatal(err)
 	}
-	req.Header.Add("X-Auth-Token", token)
+	req.Header.Add("X-Auth-Token", c.Token)
 	req.Header.Add("Content-Type", "text/plain")
 
 	client := &http.Client{}
@@ -102,12 +102,12 @@ func addUserData(zone, token, serverID, userData string) {
 	fmt.Println(bodyString)
 }
 
-func listServer(zone, token string) {
-	req, err := http.NewRequest("GET", "https://api.scaleway.com/instance/v1/zones/"+zone+"/servers", nil)
+func (c *Config) ListServer() {
+	req, err := http.NewRequest("GET", "https://api.scaleway.com/instance/v1/zones/"+c.Zone+"/servers", nil)
 	if err != nil {
 		log.Fatal(err)
 	}
-	req.Header.Add("X-Auth-Token", token)
+	req.Header.Add("X-Auth-Token", c.Token)
 	req.Header.Add("Content-Type", "application/json")
 
 	client := &http.Client{}
@@ -125,36 +125,12 @@ func listServer(zone, token string) {
 	fmt.Println(bodyString)
 }
 
-func listSecurityGroups(zone, token string) {
-	req, err := http.NewRequest("GET", "https://api.scaleway.com/instance/v1/zones/"+zone+"/security_groups", nil)
+func (c *Config) ListSecurityGroups() {
+	req, err := http.NewRequest("GET", "https://api.scaleway.com/instance/v1/zones/"+c.Zone+"/security_groups", nil)
 	if err != nil {
 		log.Fatal(err)
 	}
-	req.Header.Add("X-Auth-Token", token)
-	req.Header.Add("Content-Type", "application/json")
-
-	client := &http.Client{}
-	resp, err := client.Do(req)
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer resp.Body.Close()
-
-	bodyBytes, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	bodyString := string(bodyBytes)
-	fmt.Println(bodyString)
-}
-
-func listUserData(zone, token, serverID string) {
-	req, err := http.NewRequest("GET", "https://api.scaleway.com/instance/v1/zones/"+zone+"/servers/"+serverID+"/user_data/cloud-init", nil)
-	if err != nil {
-		log.Fatal(err)
-	}
-	req.Header.Add("X-Auth-Token", token)
+	req.Header.Add("X-Auth-Token", c.Token)
 	req.Header.Add("Content-Type", "application/json")
 
 	client := &http.Client{}
@@ -173,12 +149,36 @@ func listUserData(zone, token, serverID string) {
 	fmt.Println(bodyString)
 }
 
-func getSrv(zone, token, serverID string) srvResp {
-	req, err := http.NewRequest("GET", "https://api.scaleway.com/instance/v1/zones/"+zone+"/servers/"+serverID, nil)
+func (c *Config) ListUserData(serverID string) {
+	req, err := http.NewRequest("GET", "https://api.scaleway.com/instance/v1/zones/"+c.Zone+"/servers/"+serverID+"/user_data/cloud-init", nil)
 	if err != nil {
 		log.Fatal(err)
 	}
-	req.Header.Add("X-Auth-Token", token)
+	req.Header.Add("X-Auth-Token", c.Token)
+	req.Header.Add("Content-Type", "application/json")
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer resp.Body.Close()
+
+	bodyBytes, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	bodyString := string(bodyBytes)
+	fmt.Println(bodyString)
+}
+
+func (c *Config) GetSrv(serverID string) srvResp {
+	req, err := http.NewRequest("GET", "https://api.scaleway.com/instance/v1/zones/"+c.Zone+"/servers/"+serverID, nil)
+	if err != nil {
+		log.Fatal(err)
+	}
+	req.Header.Add("X-Auth-Token", c.Token)
 	req.Header.Add("Content-Type", "application/json")
 
 	client := &http.Client{}
@@ -201,7 +201,7 @@ func getSrv(zone, token, serverID string) srvResp {
 	return serverResp
 }
 
-func updateSrvState(zone, token, serverID, state string) {
+func (c *Config) UpdateSrvState(serverID, state string) {
 	var newAction srvAction
 	newAction.Action = state
 	json_data, err := json.Marshal(newAction)
@@ -210,11 +210,11 @@ func updateSrvState(zone, token, serverID, state string) {
 	}
 
 	fmt.Println(string(json_data))
-	req, err := http.NewRequest("POST", "https://api.scaleway.com/instance/v1/zones/"+zone+"/servers/"+serverID+"/action", bytes.NewBuffer(json_data))
+	req, err := http.NewRequest("POST", "https://api.scaleway.com/instance/v1/zones/"+c.Zone+"/servers/"+serverID+"/action", bytes.NewBuffer(json_data))
 	if err != nil {
 		log.Fatal(err)
 	}
-	req.Header.Add("X-Auth-Token", token)
+	req.Header.Add("X-Auth-Token", c.Token)
 	req.Header.Add("Content-Type", "application/json")
 
 	client := &http.Client{}
@@ -232,36 +232,12 @@ func updateSrvState(zone, token, serverID, state string) {
 	fmt.Println(bodyString)
 }
 
-func deleteFlexibleIP(zone, token, ipID string) {
-	req, err := http.NewRequest("DELETE", "https://api.scaleway.com/instance/v1/zones/"+zone+"/ips/"+ipID, nil)
+func (c *Config) DeleteFlexibleIP(flexibleIPID string) {
+	req, err := http.NewRequest("DELETE", "https://api.scaleway.com/instance/v1/zones/"+c.Zone+"/ips/"+flexibleIPID, nil)
 	if err != nil {
 		log.Fatal(err)
 	}
-	req.Header.Add("X-Auth-Token", token)
-	req.Header.Add("Content-Type", "application/json")
-
-	client := &http.Client{}
-	resp, err := client.Do(req)
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer resp.Body.Close()
-
-	bodyBytes, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	bodyString := string(bodyBytes)
-	fmt.Println(bodyString)
-}
-
-func deleteVolume(zone, token, volumeID string) {
-	req, err := http.NewRequest("DELETE", "https://api.scaleway.com/instance/v1/zones/"+zone+"/volumes/"+volumeID, nil)
-	if err != nil {
-		log.Fatal(err)
-	}
-	req.Header.Add("X-Auth-Token", token)
+	req.Header.Add("X-Auth-Token", c.Token)
 	req.Header.Add("Content-Type", "application/json")
 
 	client := &http.Client{}
@@ -280,12 +256,36 @@ func deleteVolume(zone, token, volumeID string) {
 	fmt.Println(bodyString)
 }
 
-func deleteSrv(zone, token, serverID string) {
-	req, err := http.NewRequest("DELETE", "https://api.scaleway.com/instance/v1/zones/"+zone+"/servers/"+serverID, nil)
+func (c *Config) DeleteVolume(volumeID string) {
+	req, err := http.NewRequest("DELETE", "https://api.scaleway.com/instance/v1/zones/"+c.Zone+"/volumes/"+volumeID, nil)
 	if err != nil {
 		log.Fatal(err)
 	}
-	req.Header.Add("X-Auth-Token", token)
+	req.Header.Add("X-Auth-Token", c.Token)
+	req.Header.Add("Content-Type", "application/json")
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer resp.Body.Close()
+
+	bodyBytes, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	bodyString := string(bodyBytes)
+	fmt.Println(bodyString)
+}
+
+func (c *Config) DeleteSrv(serverID string) {
+	req, err := http.NewRequest("DELETE", "https://api.scaleway.com/instance/v1/zones/"+c.Zone+"/servers/"+serverID, nil)
+	if err != nil {
+		log.Fatal(err)
+	}
+	req.Header.Add("X-Auth-Token", c.Token)
 	req.Header.Add("Content-Type", "application/json")
 
 	client := &http.Client{}
@@ -530,4 +530,9 @@ type srvResp struct {
 			} `json:"0"`
 		} `json:"volumes"`
 	} `json:"server"`
+}
+
+type Config struct {
+	Token string `json:"token"`
+	Zone  string `json:"zone"`
 }
