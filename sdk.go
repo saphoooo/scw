@@ -142,6 +142,7 @@ func (c *Config) CreateSecurityGroupRule(SecurityGroupID string, newSecurityGrou
 	var ruleResp SecurityGroupRuleResp
 	err = json.Unmarshal(bodyBytes, &ruleResp)
 	if err != nil {
+		log.Println(string(bodyBytes))
 		log.Fatalln(err)
 	}
 	return ruleResp
