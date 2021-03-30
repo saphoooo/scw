@@ -113,7 +113,7 @@ func (c *Config) CreateSecurityGroup(newSecurityGroup SecurityGroup) SecurityGro
 	return sgResp
 }
 
-func (c *Config) CreateSecurityGroupRule(SecurityGroupID string, newSecurityGroupRule SecurityGroupRule) SecurityGroupRuleResp {
+func (c *Config) CreateSecurityGroupRule(SecurityGroupID string, newSecurityGroupRule *SecurityGroupRule) SecurityGroupRuleResp {
 	json_data, err := json.Marshal(newSecurityGroupRule)
 	if err != nil {
 		log.Fatal(err)
@@ -704,9 +704,9 @@ type SecurityGroupRule struct {
 	Action       string `json:"action"`
 	IPRange      string `json:"ip_range"`
 	DestPortFrom int    `json:"dest_port_from"`
-	DestPortTo   int    `json:"dest_port_to"`
-	Position     int    `json:"position"`
-	Editable     bool   `json:"editable"`
+	DestPortTo   int    `json:"dest_port_to,omitempty"`
+	Position     int    `json:"position,omitempty"`
+	Editable     bool   `json:"editable,omitempty"`
 	Zone         string `json:"zone,omitempty"`
 }
 
