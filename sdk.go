@@ -173,6 +173,30 @@ func (c *Config) ListUserData(serverID string) {
 	fmt.Println(bodyString)
 }
 
+func (c *Config) ListSercurityGroupRules(sercurityGroupID string) {
+	req, err := http.NewRequest("GET", "https://api.scaleway.com/https://api.scaleway.com/instance/v1/zones/"+c.Zone+"/security_groups/"+sercurityGroupID+"/rules", nil)
+	if err != nil {
+		log.Fatal(err)
+	}
+	req.Header.Add("X-Auth-Token", c.Token)
+	req.Header.Add("Content-Type", "application/json")
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer resp.Body.Close()
+
+	bodyBytes, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	bodyString := string(bodyBytes)
+	fmt.Println(bodyString)
+}
+
 func (c *Config) GetSecurityGroup(sercurityGroupID string) {
 	req, err := http.NewRequest("GET", "https://api.scaleway.com/instance/v1/zones/"+c.Zone+"/security_groups/"+sercurityGroupID, nil)
 	if err != nil {
