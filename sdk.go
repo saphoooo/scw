@@ -79,6 +79,74 @@ func (c *Config) CreateSrv(server *Server) SrvResp {
 	return serverResponse
 }
 
+func (c *Config) CreateSecurityGroup(newSecurityGroup SecurityGroup) SecurityGroupResp {
+	json_data, err := json.Marshal(newSecurityGroup)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	fmt.Println(string(json_data))
+	req, err := http.NewRequest("POST", "https://api.scaleway.com/instance/v1/zones/"+c.Zone+"/security_groups", bytes.NewBuffer(json_data))
+	if err != nil {
+		log.Fatal(err)
+	}
+	req.Header.Add("X-Auth-Token", c.Token)
+	req.Header.Add("Content-Type", "application/json")
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer resp.Body.Close()
+
+	bodyBytes, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	var sgResp SecurityGroupResp
+	err = json.Unmarshal(bodyBytes, &sgResp)
+	if err != nil {
+		log.Fatalln(err)
+	}
+	return sgResp
+}
+
+func (c *Config) CreateSecurityGroupRule(SecurityGroupID string, newSecurityGroupRule SecurityGroupRule) SecurityGroupRuleResp {
+	json_data, err := json.Marshal(newSecurityGroupRule)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	fmt.Println(string(json_data))
+	req, err := http.NewRequest("POST", "https://api.scaleway.com/instance/v1/zones/"+c.Zone+"/security_groups/"+SecurityGroupID+"/rules", bytes.NewBuffer(json_data))
+	if err != nil {
+		log.Fatal(err)
+	}
+	req.Header.Add("X-Auth-Token", c.Token)
+	req.Header.Add("Content-Type", "application/json")
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer resp.Body.Close()
+
+	bodyBytes, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	var ruleResp SecurityGroupRuleResp
+	err = json.Unmarshal(bodyBytes, &ruleResp)
+	if err != nil {
+		log.Fatalln(err)
+	}
+	return ruleResp
+}
+
 func (c *Config) AddUserData(serverID, userData string) {
 	req, err := http.NewRequest("PATCH", "https://api.scaleway.com/instance/v1/zones/"+c.Zone+"/servers/"+serverID+"/user_data/cloud-init", bytes.NewBuffer([]byte(userData)))
 	if err != nil {
@@ -627,6 +695,23 @@ type SecurityGroupResp struct {
 		Stateful bool   `json:"stateful,omitempty"`
 		Zone     string `json:"zone,omitempty"`
 	} `json:"security_group"`
+}
+
+type SecurityGroupRule struct {
+	ID           string `json:"protocol,omitempty"`
+	Protocol     string `json:"protocol"`
+	Direction    string `json:"direction"`
+	Action       string `json:"action"`
+	IPRange      string `json:"ip_range"`
+	DestPortFrom int    `json:"dest_port_from"`
+	DestPortTo   int    `json:"dest_port_to"`
+	Position     int    `json:"position"`
+	Editable     bool   `json:"editable"`
+	Zone         string `json:"zone,omitempty"`
+}
+
+type SecurityGroupRuleResp struct {
+	Rule SecurityGroupRule `json:"rule"`
 }
 
 type Config struct {
