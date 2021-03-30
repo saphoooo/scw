@@ -79,18 +79,16 @@ func (c *Config) CreateSrv(server *Server) SrvResp {
 	return serverResponse
 }
 
-//func (c *Config) CreateSecurityGroup(newSecurityGroup SecurityGroup) SecurityGroupResp {
-func (c *Config) CreateSecurityGroup(newSecurityGroup SecurityGroup) {
+func (c *Config) CreateSecurityGroup(newSecurityGroup SecurityGroup) SecurityGroupResp {
 	json_data, err := json.Marshal(newSecurityGroup)
 	if err != nil {
 		log.Fatal(err)
 	}
-
-	fmt.Println(string(json_data))
 	req, err := http.NewRequest("POST", "https://api.scaleway.com/instance/v1/zones/"+c.Zone+"/security_groups", bytes.NewBuffer(json_data))
 	if err != nil {
 		log.Fatal(err)
 	}
+
 	req.Header.Add("X-Auth-Token", c.Token)
 	req.Header.Add("Content-Type", "application/json")
 
@@ -106,16 +104,13 @@ func (c *Config) CreateSecurityGroup(newSecurityGroup SecurityGroup) {
 		log.Fatal(err)
 	}
 
-	bodyString := string(bodyBytes)
-	fmt.Println(bodyString)
-	/*
-		var sgResp SecurityGroupResp
-		err = json.Unmarshal(bodyBytes, &sgResp)
-		if err != nil {
-			log.Fatalln(err)
-		}
-		return sgResp
-	*/
+	var sgResp SecurityGroupResp
+	err = json.Unmarshal(bodyBytes, &sgResp)
+	if err != nil {
+		log.Println(string(bodyBytes))
+		log.Fatalln(err)
+	}
+	return sgResp
 }
 
 func (c *Config) CreateSecurityGroupRule(SecurityGroupID string, newSecurityGroupRule SecurityGroupRule) SecurityGroupRuleResp {
