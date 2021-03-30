@@ -79,7 +79,8 @@ func (c *Config) CreateSrv(server *Server) SrvResp {
 	return serverResponse
 }
 
-func (c *Config) CreateSecurityGroup(newSecurityGroup SecurityGroup) SecurityGroupResp {
+//func (c *Config) CreateSecurityGroup(newSecurityGroup SecurityGroup) SecurityGroupResp {
+func (c *Config) CreateSecurityGroup(newSecurityGroup SecurityGroup) {
 	json_data, err := json.Marshal(newSecurityGroup)
 	if err != nil {
 		log.Fatal(err)
@@ -105,12 +106,16 @@ func (c *Config) CreateSecurityGroup(newSecurityGroup SecurityGroup) SecurityGro
 		log.Fatal(err)
 	}
 
-	var sgResp SecurityGroupResp
-	err = json.Unmarshal(bodyBytes, &sgResp)
-	if err != nil {
-		log.Fatalln(err)
-	}
-	return sgResp
+	bodyString := string(bodyBytes)
+	fmt.Println(bodyString)
+	/*
+		var sgResp SecurityGroupResp
+		err = json.Unmarshal(bodyBytes, &sgResp)
+		if err != nil {
+			log.Fatalln(err)
+		}
+		return sgResp
+	*/
 }
 
 func (c *Config) CreateSecurityGroupRule(SecurityGroupID string, newSecurityGroupRule SecurityGroupRule) SecurityGroupRuleResp {
@@ -688,7 +693,7 @@ type SecurityGroupResp struct {
 		ProjectDefault        bool   `json:"project_default,omitempty"`
 		CreationDate          string `json:"creation_date,omitempty"`
 		ModificationDate      string `json:"modification_date,omitempty"`
-		Servers               struct {
+		Servers               []struct {
 			ID   string `json:"id,omitempty"`
 			Name string `json:"name,omitempty"`
 		} `json:"servers,omitempty"`
@@ -698,7 +703,7 @@ type SecurityGroupResp struct {
 }
 
 type SecurityGroupRule struct {
-	ID           string `json:"protocol,omitempty"`
+	ID           string `json:"id,omitempty"`
 	Protocol     string `json:"protocol"`
 	Direction    string `json:"direction"`
 	Action       string `json:"action"`
