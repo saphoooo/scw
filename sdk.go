@@ -174,7 +174,7 @@ func (c *Config) ListUserData(serverID string) {
 }
 
 func (c *Config) ListSercurityGroupRules(sercurityGroupID string) {
-	req, err := http.NewRequest("GET", "https://api.scaleway.com/https://api.scaleway.com/instance/v1/zones/"+c.Zone+"/security_groups/"+sercurityGroupID+"/rules", nil)
+	req, err := http.NewRequest("GET", "https://api.scaleway.com/instance/v1/zones/"+c.Zone+"/security_groups/"+sercurityGroupID+"/rules", nil)
 	if err != nil {
 		log.Fatal(err)
 	}
