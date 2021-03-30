@@ -193,12 +193,22 @@ func (c *Config) GetSecurityGroup(sercurityGroupID string) SecurityGroupResp {
 		log.Fatal(err)
 	}
 
-	var securityGroupResp SecurityGroupResp
-	err = json.Unmarshal(bodyBytes, &securityGroupResp)
-	if err != nil {
-		log.Fatalln(err)
-	}
-	return securityGroupResp
+	bodyString := string(bodyBytes)
+	fmt.Println(bodyString)
+
+	/*
+		bodyBytes, err := ioutil.ReadAll(resp.Body)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		var securityGroupResp SecurityGroupResp
+		err = json.Unmarshal(bodyBytes, &securityGroupResp)
+		if err != nil {
+			log.Fatalln(err)
+		}
+		return securityGroupResp
+	*/
 }
 
 func (c *Config) GetSrv(serverID string) SrvResp {
